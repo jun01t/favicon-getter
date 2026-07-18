@@ -1,4 +1,8 @@
-import { getFavicon, getFaviconUrl } from "../src/index.js";
+import { getFavicon, getFaviconUrl, parseSize } from "../src/index.js";
+
+function isClientError(error) {
+  return error instanceof TypeError;
+}
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -7,12 +11,20 @@ export default async function handler(req, res) {
   }
 
   const url = typeof req.query.url === "string" ? req.query.url : undefined;
-  const size = Number(
-    typeof req.query.size === "string" ? req.query.size : 32
-  );
+  const rawSize =
+    typeof req.query.size === "string" ? req.query.size : undefined;
 
   if (!url) {
     return res.status(400).json({ error: "url is required" });
+  }
+
+  let size;
+  try {
+    size = parseSize(rawSize === undefined ? 32 : rawSize);
+  } catch (error) {
+    return res.status(400).json({
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 
   try {
@@ -23,7 +35,8 @@ export default async function handler(req, res) {
     res.setHeader("Access-Control-Expose-Headers", "X-Favicon-Source");
     return res.status(200).send(buffer);
   } catch (error) {
-    return res.status(502).json({
+    const status = isClientError(error) ? 400 : 502;
+    return res.status(status).json({
       error: error instanceof Error ? error.message : String(error),
       sourceUrl: (() => {
         try {

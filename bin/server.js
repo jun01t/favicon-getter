@@ -4,7 +4,7 @@ import http from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { getFavicon, getFaviconUrl } from "../src/index.js";
+import { getFavicon, getFaviconUrl, parseSize } from "../src/index.js";
 
 const PORT = Number(process.env.PORT) || 3000;
 const PUBLIC_DIR = join(fileURLToPath(new URL(".", import.meta.url)), "../public");
@@ -44,10 +44,20 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === "GET" && requestUrl.pathname === "/api/favicon") {
     const url = requestUrl.searchParams.get("url");
-    const size = Number(requestUrl.searchParams.get("size") || 32);
+    const rawSize = requestUrl.searchParams.get("size");
 
     if (!url) {
       sendJson(res, 400, { error: "url is required" });
+      return;
+    }
+
+    let size;
+    try {
+      size = parseSize(rawSize ?? 32);
+    } catch (error) {
+      sendJson(res, 400, {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return;
     }
 
@@ -61,9 +71,16 @@ const server = http.createServer(async (req, res) => {
       });
       res.end(buffer);
     } catch (error) {
-      sendJson(res, 502, {
+      const status = error instanceof TypeError ? 400 : 502;
+      let sourceUrl;
+      try {
+        sourceUrl = getFaviconUrl(url, size);
+      } catch {
+        sourceUrl = undefined;
+      }
+      sendJson(res, status, {
         error: error instanceof Error ? error.message : String(error),
-        sourceUrl: getFaviconUrl(url, size),
+        sourceUrl,
       });
     }
     return;
@@ -71,7 +88,7 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === "GET" && requestUrl.pathname === "/api/url") {
     const url = requestUrl.searchParams.get("url");
-    const size = Number(requestUrl.searchParams.get("size") || 32);
+    const rawSize = requestUrl.searchParams.get("size");
 
     if (!url) {
       sendJson(res, 400, { error: "url is required" });
@@ -79,6 +96,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     try {
+      const size = parseSize(rawSize ?? 32);
       sendJson(res, 200, { url: getFaviconUrl(url, size) });
     } catch (error) {
       sendJson(res, 400, {

@@ -2,7 +2,7 @@
 
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { getFavicon, getFaviconUrl } from "../src/index.js";
+import { getFavicon, getFaviconUrl, parseSize } from "../src/index.js";
 
 function printUsage() {
   console.log(`Usage:
@@ -97,9 +97,7 @@ async function main() {
     process.exit(args.help ? 0 : 1);
   }
 
-  if (!Number.isFinite(args.size) || args.size <= 0) {
-    throw new Error("size must be a positive number");
-  }
+  parseSize(args.size);
 
   if (args.urlOnly) {
     console.log(getFaviconUrl(args.url, args.size));
