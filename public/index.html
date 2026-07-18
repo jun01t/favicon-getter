@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>favicon-getter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=IBM+Plex+Sans+JP:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true"></div>
+
+    <main class="stage">
+      <header class="brand">
+        <p class="brand__mark">favicon-getter</p>
+        <h1 class="brand__lead">サイトのアイコンを、その場で。</h1>
+        <p class="brand__support">
+          URL とサイズを渡すと、Google の favicon サービスから取得します。
+        </p>
+      </header>
+
+      <form class="fetch" id="form" autocomplete="off">
+        <label class="field">
+          <span class="field__label">サイト URL</span>
+          <input
+            class="field__input"
+            name="url"
+            type="text"
+            inputmode="url"
+            placeholder="https://example.com"
+            required
+            value="https://github.com"
+          />
+        </label>
+
+        <div class="size-row">
+          <label class="field field--size">
+            <span class="field__label">サイズ <span id="sizeValue">64</span>px</span>
+            <input
+              class="field__range"
+              name="size"
+              id="size"
+              type="range"
+              min="16"
+              max="256"
+              step="8"
+              value="64"
+            />
+          </label>
+          <div class="size-presets" role="group" aria-label="サイズの候補">
+            <button type="button" class="preset" data-size="16">16</button>
+            <button type="button" class="preset" data-size="32">32</button>
+            <button type="button" class="preset" data-size="48">48</button>
+            <button type="button" class="preset is-active" data-size="64">64</button>
+            <button type="button" class="preset" data-size="128">128</button>
+            <button type="button" class="preset" data-size="256">256</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="cta" type="submit" id="submit">取得する</button>
+        </div>
+      </form>
+
+      <section class="preview" id="preview" hidden>
+        <div class="preview__canvas">
+          <img id="icon" alt="取得した favicon" width="64" height="64" />
+        </div>
+        <div class="preview__meta">
+          <p class="preview__title" id="previewTitle">favicon</p>
+          <p class="preview__source" id="previewSource"></p>
+          <div class="preview__actions">
+            <a class="ghost" id="download" download="favicon.png">ダウンロード</a>
+            <button class="ghost" type="button" id="copyUrl">URL をコピー</button>
+          </div>
+          <p class="preview__status" id="status" role="status"></p>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "favicon-getter",
+  "version": "1.0.0",
+  "description": "Fetch site favicons via Google's favicon service (URL and size as parameters)",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "favicon-getter": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/server.js",
+    "server": "node bin/server.js",
+    "get": "node bin/cli.js"
+  },
+  "keywords": [
+    "favicon",
+    "icon",
+    "google"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
